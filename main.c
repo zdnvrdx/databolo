@@ -5,14 +5,33 @@
 #include <string.h>
 #include "bolos.h"
 
-int main(void)
-{
+
+void consultarPedidos(){
+    FILE *arq;
+  struct pedido p;
+  arq=fopen(NOMEARQUIVO,"rb");
+  if(arq==NULL){
+    fprintf(stderr,"Nao abriu %s\n",NOMEARQUIVO);
+    exit(1);
+  }
+  printf("-- Data ----- CPF ---- Bolo --\n");
+
+  while(fread(&p,sizeof(p),1,arq)==1 && !feof(arq))
+    printf("%02d/%02d/%04d %6llu %6s\n",
+           p.quando.dia, p.quando.mes, p.quando.ano,
+           p.cpf, p.tipo_bolo);
+  printf("---------------------------------\n");
+  fclose(arq);
+
+
+  }
+
+  void pedidoNovo(){
   FILE *arq;
   struct data nova;
   struct pedido pd;
   int achou;
   char escolha;
-  
   /*Tenta abrir para leitura/escrita*/
   arq=fopen(NOMEARQUIVO,"r+b");
   if(arq==NULL){ /* Se não abriu, tenta criar novo */
@@ -42,7 +61,7 @@ int main(void)
       pd.quando.mes = nova.mes;
       pd.quando.ano = nova.ano;
       printf("CPF (somente numeros): ");
-      scanf("%ld", &pd.cpf);
+      scanf("%llu", &pd.cpf);
       printf("tipo de bolo: ");
       scanf("%s", pd.tipo_bolo);
       /* Posiciona o cursor no final do arquivo */
@@ -54,22 +73,40 @@ int main(void)
     scanf(" %c",&escolha);
   }while(toupper(escolha)=='S');
   fclose(arq);
-
-  struct pedido p;
-  
-  /* Tenta abrir o arquivo para leitura */
-  arq=fopen(NOMEARQUIVO,"rb");
-  if(arq==NULL){
-    fprintf(stderr,"Nao abriu %s\n",NOMEARQUIVO);
-    exit(1);
   }
-  printf("-- Data ----- CPF ---- Bolo --\n");
-  /* Exibe todos os registros cadastrados */
-  while(fread(&p,sizeof(p),1,arq)==1 && !feof(arq))
-    printf("%02d/%02d/%04d %6ld %6s\n",
-           p.quando.dia, p.quando.mes, p.quando.ano,
-           p.cpf, p.tipo_bolo);
-  printf("---------------------------------\n");
-  fclose(arq);
+
+
+int main(void)
+{
+
+    int flagMenu=-1;
+
+    printf("██████╗░░█████╗░████████╗░█████╗░██████╗░░█████╗░██╗░░░░░░█████╗░\n");
+    printf("██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██║░░░░░██╔══██╗\n");
+    printf("██║░░██║███████║░░░██║░░░███████║██████╦╝██║░░██║██║░░░░░██║░░██║\n");
+    printf("██║░░██║██╔══██║░░░██║░░░██╔══██║██╔══██╗██║░░██║██║░░░░░██║░░██║\n");
+    printf("██████╔╝██║░░██║░░░██║░░░██║░░██║██████╦╝╚█████╔╝███████╗╚█████╔╝\n");
+    printf("╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝░╚════╝░\n");
+
+
+    while(flagMenu!=3){
+    printf("Digite:\n 1 - NOVO PEDIDO\n 2 - CONSULTAR PEDIDOS\n 3 - SAIR\n ");
+    scanf("%d", &flagMenu);
+    switch(flagMenu){
+      case 1:
+        pedidoNovo();
+        break;
+      case 2:
+        consultarPedidos();
+        break;
+      case 3:
+        break;
+      default:
+        printf("DIGITO INCORRETO!\n");
+    }
+  }
+    
+
   return(0);
 }
+

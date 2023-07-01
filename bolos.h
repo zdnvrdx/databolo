@@ -9,11 +9,11 @@ struct data{
 
 struct cliente{
   char nome[max_length_nome];
-  long int cpf;
+  unsigned long long int cpf;
 };
 
 struct pedido{
   struct data quando;
-  long int cpf;
+  unsigned long long int cpf;
   char tipo_bolo[max_length_bolo];
 };
