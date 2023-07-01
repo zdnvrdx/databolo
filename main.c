@@ -14,12 +14,13 @@ void consultarPedidos(){
     fprintf(stderr,"Nao abriu %s\n",NOMEARQUIVO);
     exit(1);
   }
-  printf("-- Data ----- CPF ---- Bolo --\n");
+  printf("---------------------------------\n");
+  
+  printf("-- Nome ----- CPF ----- Bolo ---- Data --\n");
 
   while(fread(&p,sizeof(p),1,arq)==1 && !feof(arq))
-    printf("%02d/%02d/%04d %6llu %6s\n",
-           p.quando.dia, p.quando.mes, p.quando.ano,
-           p.cpf, p.tipo_bolo);
+    printf("%s %6llu %6s %02d/%02d/%04d\n",
+           p.nome_cliente, p.cpf, p.tipo_bolo, p.quando.dia, p.quando.mes, p.quando.ano);
   printf("---------------------------------\n");
   fclose(arq);
 
@@ -28,7 +29,7 @@ void consultarPedidos(){
 
   void pedidoNovo(){
   FILE *arq;
-  struct data nova;
+  char novo_nome[100];
   struct pedido pd;
   int achou;
   char escolha;
@@ -38,32 +39,32 @@ void consultarPedidos(){
     arq = fopen(NOMEARQUIVO,"w+b");
     if(arq==NULL){
       fprintf(stderr,"Nao consegui criar %s\n", NOMEARQUIVO);
+      
       exit(1);
     }
   }
   do{
-    printf("\nData : ");
-    scanf("%d/%d/%d", &nova.dia, &nova.mes, &nova.ano);
+    printf("\nNome: ");
+    scanf(" %[^\n]", novo_nome);
     /* Posiciona no inicio do arquivo */
     rewind(arq);
     achou = 0;
     /* Lê até o final ,procurando pela data */
     while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq))
-      if(nova.dia==pd.quando.dia &&
-         nova.mes==pd.quando.mes &&
-         nova.ano==pd.quando.ano){
-          printf("Data ja cadastrada!\n");
+      if(strcmp(novo_nome, pd.nome_cliente)==0){
+          printf("Cliente ja cadastrado!\n");
+          
           achou = 1;
           break;
     }
     if(achou==0){
-      pd.quando.dia = nova.dia;
-      pd.quando.mes = nova.mes;
-      pd.quando.ano = nova.ano;
+      strcpy(pd.nome_cliente, novo_nome);
       printf("CPF (somente numeros): ");
       scanf("%llu", &pd.cpf);
       printf("tipo de bolo: ");
       scanf("%s", pd.tipo_bolo);
+      printf("Data : ");
+      scanf("%d/%d/%d", &pd.quando.dia, &pd.quando.mes, &pd.quando.ano);
       /* Posiciona o cursor no final do arquivo */
       fseek(arq,0,SEEK_END);
       /* Inclui novo registro */
