@@ -76,6 +76,58 @@ void consultarPedidos(){
   fclose(arq);
   }
 
+  void localizarPedidos(){
+    FILE *arq;
+    char loc_nome[100];
+    struct pedido pd;
+    int tipo_localiza, encontrados;
+    char escolha;
+    /*Tenta abrir para leitura/escrita*/
+    arq=fopen(NOMEARQUIVO,"rb");
+  if(arq==NULL){
+    fprintf(stderr,"Nao abriu %s\n",NOMEARQUIVO);
+    exit(1);
+  }
+    do{
+      tipo_localiza = 0;
+      encontrados = 0;
+      printf("\nLocalizar por:\n");
+      printf(" 1 - NOME\n");
+      scanf("%d", &tipo_localiza);
+      /* Posiciona no inicio do arquivo */
+      rewind(arq);
+      switch (tipo_localiza)
+        {
+        case 1:
+          printf("\nNome: ");
+          scanf(" %[^\n]", loc_nome);
+          while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq))
+            if (strstr(pd.nome_cliente, loc_nome)!=NULL)
+            {
+              printf("%s %6llu %6s %02d/%02d/%04d\n",
+              pd.nome_cliente, pd.cpf, pd.tipo_bolo, pd.quando.dia, pd.quando.mes, pd.quando.ano);
+              encontrados++;
+            }
+          if (encontrados==0)
+          {
+            printf("\nNao foram encontrados resultados para a busca\n");
+          }
+          
+          break;
+        
+        default:
+          printf("DIGITO INCORRETO\n");
+          while (getchar() != '\n');
+          continue;
+        }
+      
+      printf("\nContinuar? [S/N]: ");
+      scanf(" %c",&escolha);
+    
+    }while(toupper(escolha)=='S');
+    fclose(arq);
+  }
+
 
 int main(void)
 {
@@ -90,20 +142,28 @@ int main(void)
     printf("╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝░╚════╝░\n");
 
 
-    while(flagMenu!=3){
-    printf("Digite:\n 1 - NOVO PEDIDO\n 2 - CONSULTAR PEDIDOS\n 3 - SAIR\n ");
+    while(flagMenu!=4){
+    printf("\nDigite:\n 1 - NOVO PEDIDO\n 2 - CONSULTAR PEDIDOS\n 3 - LOCALIZAR PEDIDOS\n 4 - SAIR\n ");
     scanf("%d", &flagMenu);
     switch(flagMenu){
       case 1:
         pedidoNovo();
+        flagMenu = 0;
         break;
       case 2:
         consultarPedidos();
+         flagMenu = 0;
         break;
       case 3:
+        localizarPedidos();
+         flagMenu = 0;
+        break;
+      case 4:
         break;
       default:
         printf("DIGITO INCORRETO!\n");
+        while (getchar() != '\n');
+        continue;
     }
   }
     
