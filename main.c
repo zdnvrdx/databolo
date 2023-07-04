@@ -11,6 +11,8 @@ void consultarPedidos();
 void pedidoNovo();
   
 void localizarPedidos();
+
+void excluirPedidos();
   
 int main(void)
 {
@@ -25,8 +27,8 @@ int main(void)
     printf("╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝░╚════╝░\n");
 
 
-    while(flagMenu!=4){
-    printf("\nDigite:\n 1 - NOVO PEDIDO\n 2 - CONSULTAR PEDIDOS\n 3 - LOCALIZAR PEDIDOS\n 4 - SAIR\n ");
+    while(flagMenu!=5){
+    printf("\nDigite:\n 1 - NOVO PEDIDO\n 2 - CONSULTAR PEDIDOS\n 3 - LOCALIZAR PEDIDOS\n 4 - EXCLUIR PEDIDOS\n 5 - SAIR\n ");
     scanf("%d", &flagMenu);
     switch(flagMenu){
       case 1:
@@ -42,6 +44,10 @@ int main(void)
          flagMenu = 0;
         break;
       case 4:
+        excluirPedidos();
+         flagMenu = 0;
+        break;
+      case 5: 
         break;
       default:
         printf("DIGITO INCORRETO!\n");
@@ -79,12 +85,12 @@ void consultarPedidos(){
 
 
 
-  void pedidoNovo(){
+void pedidoNovo(){
   FILE *arq;
   char novo_nome[100];
   struct pedido pd;
   int data_valida = 0;
-  int achou, cont_cpf;
+  int cont_cpf;
   unsigned long long int temp_cpf;
   char escolha;
   /*Tenta abrir para leitura/escrita*/
@@ -100,89 +106,78 @@ void consultarPedidos(){
   do{
     printf("\nNome: ");
     scanf(" %[^\n]", novo_nome);
-    /* Posiciona no inicio do arquivo */
-    rewind(arq);
-    achou = 0;
-    /* Lê até o final ,procurando pela data */
-    while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq))
-      if(strcmp(novo_nome, pd.nome_cliente)==0){
-          printf("Cliente ja cadastrado!\n");
-          
-          achou = 1;
-          break;
-    }
-    if(achou==0){
-      strcpy(pd.nome_cliente, novo_nome);
-      printf("CPF (somente numeros): ");
+    
+    strcpy(pd.nome_cliente, novo_nome);
+    printf("CPF (somente numeros): ");
       
-      do
-      {
-        cont_cpf = 0;
-        if(scanf("%llu", &pd.cpf)!=1){
-          printf("CPF precisa conter apenas numeros. Tente novamente: ");
-          while (getchar() != '\n');
+    do
+    {
+      cont_cpf = 0;
+      if(scanf("%llu", &pd.cpf)!=1){
+        printf("CPF precisa conter apenas numeros. Tente novamente: ");
+        while (getchar() != '\n');
+      }
+      else{
+      temp_cpf = pd.cpf;
+        while (temp_cpf!=0){
+          temp_cpf /= 10;
+          cont_cpf++;
         }
-        else{
-        temp_cpf = pd.cpf;
-          while (temp_cpf!=0){
-            temp_cpf /= 10;
-            cont_cpf++;
-          }
-          if(cont_cpf != 11){
-            printf("O CPF precisa de 11 digitos\n");
-            printf("Informe o CPF novamente: ");
-          }
+        if(cont_cpf != 11){
+          printf("O CPF precisa de 11 digitos\n");
+          printf("Informe o CPF novamente: ");
         }
-      } while (cont_cpf !=11);
+      }
+    } while (cont_cpf !=11);
       
-      printf("tipo de bolo: ");
-      scanf("%s", pd.tipo_bolo);
-      printf("Data (DD/MM/AAAA): ");
-      do
-      {
-        if(scanf("%d/%d/%d", &pd.quando.dia, &pd.quando.mes, &pd.quando.ano)!=3){
-          printf("Data invalida. Tente novamente (DD/MM/AAAA): ");
-          while (getchar() != '\n');
+    printf("tipo de bolo: ");
+    scanf("%s", pd.tipo_bolo);
+    printf("Data (DD/MM/AAAA): ");
+    do
+    {
+      if(scanf("%d/%d/%d", &pd.quando.dia, &pd.quando.mes, &pd.quando.ano)!=3){
+        printf("Data invalida. Tente novamente (DD/MM/AAAA): ");
+        while (getchar() != '\n');
+      }
+      else if (pd.quando.dia < 1 || pd.quando.dia > 31 || pd.quando.mes < 1 || pd.quando.mes > 12) {
+        if (pd.quando.dia < 1 || pd.quando.dia > 31) {
+          printf("Dia invalido. Insira um valor entre 1 e 31.\n");
         }
-        else if (pd.quando.dia < 1 || pd.quando.dia > 31 || pd.quando.mes < 1 || pd.quando.mes > 12) {
-          if (pd.quando.dia < 1 || pd.quando.dia > 31) {
-            printf("Dia invalido. Insira um valor entre 1 e 31.\n");
-          }
-          else if (pd.quando.mes < 1 || pd.quando.mes > 12) {
-            printf("Mes invalido. Insira um valor entre 1 e 12.\n");
-          }
+        else if (pd.quando.mes < 1 || pd.quando.mes > 12) {
+          printf("Mes invalido. Insira um valor entre 1 e 12.\n");
+        }
+        printf("Tente novamente (DD/MM/AAAA): ");
+        while (getchar() != '\n');
+      }
+      else if ((pd.quando.dia > 30) &&
+          (pd.quando.mes == 4 || pd.quando.mes == 6 || pd.quando.mes == 9 || pd.quando.mes == 11)) {
+          printf("O mes %d contem apenas 30 dias. Insira um valor entre 1 e 30 para o dia.\n", pd.quando.mes);
           printf("Tente novamente (DD/MM/AAAA): ");
           while (getchar() != '\n');
         }
-        else if ((pd.quando.dia > 30) &&
-           (pd.quando.mes == 4 || pd.quando.mes == 6 || pd.quando.mes == 9 || pd.quando.mes == 11)) {
-            printf("O mes %d contem apenas 30 dias. Insira um valor entre 1 e 30 para o dia.\n", pd.quando.mes);
-            printf("Tente novamente (DD/MM/AAAA): ");
-            while (getchar() != '\n');
-          }
-        else if (pd.quando.dia == 29 && pd.quando.mes == 2) {
-          if ((pd.quando.ano % 4 == 0 && pd.quando.ano % 100 != 0) || pd.quando.ano % 400 == 0) {
-            data_valida = 1;
-         } 
-          else {
-            printf("O ano %d nao e bissexto. Informe novamente (DD/MM/AAAA): ", pd.quando.ano);
-            
-          }
-        }
-        else if(pd.quando.dia > 28 && pd.quando.mes == 2){
-           printf("Fevereiro contem apenas 28 dias. Informe novamente (DD/MM/AAAA): ");
-           
-        }
-        else{
+      else if (pd.quando.dia == 29 && pd.quando.mes == 2) {
+        if ((pd.quando.ano % 4 == 0 && pd.quando.ano % 100 != 0) || pd.quando.ano % 400 == 0) {
           data_valida = 1;
+        } 
+        else {
+          printf("O ano %d nao e bissexto. Informe novamente (DD/MM/AAAA): ", pd.quando.ano);
+            
         }
-      } while (data_valida!=1);
+      }
+      else if(pd.quando.dia > 28 && pd.quando.mes == 2){
+          printf("Fevereiro contem apenas 28 dias. Informe novamente (DD/MM/AAAA): ");
+           
+      }
+      else{
+        data_valida = 1;
+      }
+    } while (data_valida!=1);
       
-      /* Posiciona o cursor no final do arquivo */
-      fseek(arq,0,SEEK_END);
-      /* Inclui novo registro */
-      fwrite(&pd,sizeof(pd),1,arq);
-    }
+    /* Posiciona o cursor no final do arquivo */
+    fseek(arq,0,SEEK_END);
+    /* Inclui novo registro */
+    fwrite(&pd,sizeof(pd),1,arq);
+  
     printf("\nContinuar? [S/N]: ");
     scanf(" %c",&escolha);
   }while(toupper(escolha)=='S');
@@ -191,7 +186,7 @@ void consultarPedidos(){
 
 
 
-  void localizarPedidos(){
+void localizarPedidos(){
     FILE *arq;
     char localiza[100];
     struct pedido pd;
@@ -301,3 +296,133 @@ void consultarPedidos(){
     }while(toupper(escolha)=='S');
     fclose(arq);
   }
+
+
+
+void excluirPedidos(){
+  FILE *arq;
+  FILE *arq_temp;
+  struct pedido pd;
+  char nome_excl[100];
+  unsigned long long int cpf_excl;
+  int data_valida = 0;
+  int cont_cpf;
+  unsigned long long int temp_cpf;
+  char tipo_bolo_excl[30];
+  struct data data_excl;
+
+  printf("Digite os parametros do pedido a ser excluido\n");
+  printf("Nome: ");
+  scanf(" %[^\n]", nome_excl);
+  printf("CPF (somente numeros): ");
+      
+    do
+    {
+      cont_cpf = 0;
+      if(scanf("%llu", &cpf_excl)!=1){
+        printf("CPF precisa conter apenas numeros. Tente novamente: ");
+        while (getchar() != '\n');
+      }
+      else{
+      temp_cpf = cpf_excl;
+        while (temp_cpf!=0){
+          temp_cpf /= 10;
+          cont_cpf++;
+        }
+        if(cont_cpf != 11){
+          printf("O CPF precisa de 11 digitos\n");
+          printf("Informe o CPF novamente: ");
+        }
+      }
+    } while (cont_cpf !=11);
+      
+    printf("tipo de bolo: ");
+    scanf("%s", tipo_bolo_excl);
+    printf("Data (DD/MM/AAAA): ");
+    do
+    {
+      if(scanf("%d/%d/%d", &data_excl.dia, &data_excl.mes, &data_excl.ano)!=3){
+        printf("Data invalida. Tente novamente (DD/MM/AAAA): ");
+        while (getchar() != '\n');
+      }
+      else if (data_excl.dia < 1 || data_excl.dia > 31 || data_excl.mes < 1 || data_excl.mes > 12) {
+        if (data_excl.dia < 1 || data_excl.dia > 31) {
+          printf("Dia invalido. Insira um valor entre 1 e 31.\n");
+        }
+        else if (data_excl.mes < 1 || data_excl.mes > 12) {
+          printf("Mes invalido. Insira um valor entre 1 e 12.\n");
+        }
+        printf("Tente novamente (DD/MM/AAAA): ");
+        while (getchar() != '\n');
+      }
+      else if ((data_excl.dia > 30) &&
+          (data_excl.mes == 4 || data_excl.mes == 6 || data_excl.mes == 9 || data_excl.mes == 11)) {
+          printf("O mes %d contem apenas 30 dias. Insira um valor entre 1 e 30 para o dia.\n", data_excl.mes);
+          printf("Tente novamente (DD/MM/AAAA): ");
+          while (getchar() != '\n');
+        }
+      else if (data_excl.dia == 29 && data_excl.mes == 2) {
+        if ((data_excl.ano % 4 == 0 && data_excl.ano % 100 != 0) || data_excl.ano % 400 == 0) {
+          data_valida = 1;
+        } 
+        else {
+          printf("O ano %d nao e bissexto. Informe novamente (DD/MM/AAAA): ", data_excl.ano);
+            
+        }
+      }
+      else if(data_excl.dia > 28 && data_excl.mes == 2){
+          printf("Fevereiro contem apenas 28 dias. Informe novamente (DD/MM/AAAA): ");
+           
+      }
+      else{
+        data_valida = 1;
+      }
+    } while (data_valida!=1);
+  
+  arq = fopen(NOMEARQUIVO, "rb");
+  if (arq == NULL) {
+      fprintf(stderr, "Nao foi possivel abrir o arquivo %s\n", NOMEARQUIVO);
+      exit(1);
+    }
+
+  // Cria um arquivo temporario
+  arq_temp = fopen("temp.txt", "wb");
+  if (arq_temp == NULL) {
+      fprintf(stderr, "Nao foi possivel criar o arquivo temporario\n");
+      fclose(arq);
+      exit(1);
+  }
+
+    // Copia cada pedido do arquivo original, menos o que será excluido
+  while (fread(&pd, sizeof(pd), 1, arq) == 1 && !feof(arq)) {
+      // Check if the current pedido matches the parameters
+      if (strcmp(pd.nome_cliente, nome_excl) == 0 &&
+          pd.cpf == cpf_excl &&
+          pd.quando.dia == data_excl.dia && pd.quando.mes == data_excl.mes && pd.quando.ano == data_excl.ano &&
+          strcmp(pd.tipo_bolo, tipo_bolo_excl) == 0) {
+          continue;
+      }
+
+      // Write the current pedido to the temporary file
+      fwrite(&pd, sizeof(pd), 1, arq_temp);
+  }
+
+  // Close the input and temporary files
+  fclose(arq);
+  fclose(arq_temp);
+
+  // Remove the original file
+  if (remove(NOMEARQUIVO) != 0) {
+      fprintf(stderr, "Erro ao excluir o arquivo %s\n", NOMEARQUIVO);
+      exit(1);
+  }
+
+  // Rename the temporary file to the original file
+  if (rename("temp.txt", NOMEARQUIVO) != 0) {
+      fprintf(stderr, "Erro ao renomear o arquivo temporario\n");
+      exit(1);
+  }
+
+  printf("Pedido excluido com sucesso\n");
+}
+  

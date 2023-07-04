@@ -1,6 +1,6 @@
 /* bolos.h */
 #define NOMEARQUIVO "bolos.txt"
-#define max_length_bolo 20
+#define max_length_bolo 30
 #define max_length_nome 100
 
 struct data{
