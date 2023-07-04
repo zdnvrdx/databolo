@@ -9,11 +9,11 @@
 void consultarPedidos();
 
 void pedidoNovo();
-  
+
 void localizarPedidos();
 
 void excluirPedidos();
-  
+
 int main(void)
 {
 
@@ -47,7 +47,7 @@ int main(void)
         excluirPedidos();
          flagMenu = 0;
         break;
-      case 5: 
+      case 5:
         break;
       default:
         printf("DIGITO INCORRETO!\n");
@@ -55,7 +55,7 @@ int main(void)
         continue;
     }
   }
-    
+
 
   return(0);
 }
@@ -71,7 +71,7 @@ void consultarPedidos(){
     exit(1);
   }
   printf("---------------------------------\n");
-  
+
   printf("-- Nome ----- CPF ----- Bolo ---- Data --\n");
 
   while(fread(&p,sizeof(p),1,arq)==1 && !feof(arq))
@@ -99,17 +99,17 @@ void pedidoNovo(){
     arq = fopen(NOMEARQUIVO,"w+b");
     if(arq==NULL){
       fprintf(stderr,"Nao consegui criar %s\n", NOMEARQUIVO);
-      
+
       exit(1);
     }
   }
   do{
     printf("\nNome: ");
     scanf(" %[^\n]", novo_nome);
-    
+
     strcpy(pd.nome_cliente, novo_nome);
     printf("CPF (somente numeros): ");
-      
+
     do
     {
       cont_cpf = 0;
@@ -129,7 +129,7 @@ void pedidoNovo(){
         }
       }
     } while (cont_cpf !=11);
-      
+
     printf("tipo de bolo: ");
     scanf("%s", pd.tipo_bolo);
     printf("Data (DD/MM/AAAA): ");
@@ -158,26 +158,26 @@ void pedidoNovo(){
       else if (pd.quando.dia == 29 && pd.quando.mes == 2) {
         if ((pd.quando.ano % 4 == 0 && pd.quando.ano % 100 != 0) || pd.quando.ano % 400 == 0) {
           data_valida = 1;
-        } 
+        }
         else {
           printf("O ano %d nao e bissexto. Informe novamente (DD/MM/AAAA): ", pd.quando.ano);
-            
+
         }
       }
       else if(pd.quando.dia > 28 && pd.quando.mes == 2){
           printf("Fevereiro contem apenas 28 dias. Informe novamente (DD/MM/AAAA): ");
-           
+
       }
       else{
         data_valida = 1;
       }
     } while (data_valida!=1);
-      
+
     /* Posiciona o cursor no final do arquivo */
     fseek(arq,0,SEEK_END);
     /* Inclui novo registro */
     fwrite(&pd,sizeof(pd),1,arq);
-  
+
     printf("\nContinuar? [S/N]: ");
     scanf(" %c",&escolha);
   }while(toupper(escolha)=='S');
@@ -223,9 +223,9 @@ void localizarPedidos(){
           {
             printf("\nNao foram encontrados resultados para a busca\n");
           }
-          
+
           break;
-        
+
         case 2:
           printf("\nCPF: ");
           scanf(" %[^\n]", localiza);
@@ -242,9 +242,9 @@ void localizarPedidos(){
           {
             printf("\nNao foram encontrados resultados para a busca\n");
           }
-          
+
           break;
-        
+
         case 3:
           printf("\nTipo do bolo: ");
           scanf(" %[^\n]", localiza);
@@ -260,15 +260,15 @@ void localizarPedidos(){
           {
             printf("\nNao foram encontrados resultados para a busca\n");
           }
-          
+
           break;
-        
+
         case 4:
           localiza_data.mes = -1, localiza_data.ano = -1;
           printf("Data: ");
           scanf("%d/%d/%d", &localiza_data.dia, &localiza_data.mes, &localiza_data.ano);
           while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq)){
-            if (( pd.quando.dia == localiza_data.dia) && (localiza_data.mes == -1 || pd.quando.mes == localiza_data.mes) && 
+            if (( pd.quando.dia == localiza_data.dia) && (localiza_data.mes == -1 || pd.quando.mes == localiza_data.mes) &&
             (localiza_data.ano == -1 || pd.quando.ano == localiza_data.ano))
             {
               printf("%s %6llu %6s %02d/%02d/%04d\n",
@@ -280,19 +280,19 @@ void localizarPedidos(){
           {
             printf("\nNao foram encontrados resultados para a busca\n");
           }
-          
+
           break;
-        
-        
+
+
         default:
           printf("DIGITO INCORRETO\n");
           while (getchar() != '\n');
           continue;
         }
-      
+
       printf("\nContinuar? [S/N]: ");
       scanf(" %c",&escolha);
-    
+
     }while(toupper(escolha)=='S');
     fclose(arq);
   }
@@ -305,7 +305,7 @@ void excluirPedidos(){
   struct pedido pd;
   char nome_excl[100];
   unsigned long long int cpf_excl;
-  int data_valida = 0;
+  int data_valida = 0, excluidos = 0;
   int cont_cpf;
   unsigned long long int temp_cpf;
   char tipo_bolo_excl[30];
@@ -315,7 +315,7 @@ void excluirPedidos(){
   printf("Nome: ");
   scanf(" %[^\n]", nome_excl);
   printf("CPF (somente numeros): ");
-      
+
     do
     {
       cont_cpf = 0;
@@ -335,7 +335,7 @@ void excluirPedidos(){
         }
       }
     } while (cont_cpf !=11);
-      
+
     printf("tipo de bolo: ");
     scanf("%s", tipo_bolo_excl);
     printf("Data (DD/MM/AAAA): ");
@@ -364,21 +364,21 @@ void excluirPedidos(){
       else if (data_excl.dia == 29 && data_excl.mes == 2) {
         if ((data_excl.ano % 4 == 0 && data_excl.ano % 100 != 0) || data_excl.ano % 400 == 0) {
           data_valida = 1;
-        } 
+        }
         else {
           printf("O ano %d nao e bissexto. Informe novamente (DD/MM/AAAA): ", data_excl.ano);
-            
+
         }
       }
       else if(data_excl.dia > 28 && data_excl.mes == 2){
           printf("Fevereiro contem apenas 28 dias. Informe novamente (DD/MM/AAAA): ");
-           
+
       }
       else{
         data_valida = 1;
       }
     } while (data_valida!=1);
-  
+
   arq = fopen(NOMEARQUIVO, "rb");
   if (arq == NULL) {
       fprintf(stderr, "Nao foi possivel abrir o arquivo %s\n", NOMEARQUIVO);
@@ -400,7 +400,8 @@ void excluirPedidos(){
           pd.cpf == cpf_excl &&
           pd.quando.dia == data_excl.dia && pd.quando.mes == data_excl.mes && pd.quando.ano == data_excl.ano &&
           strcmp(pd.tipo_bolo, tipo_bolo_excl) == 0) {
-          continue;
+              excluidos++;
+              continue;
       }
 
       // Write the current pedido to the temporary file
@@ -422,7 +423,6 @@ void excluirPedidos(){
       fprintf(stderr, "Erro ao renomear o arquivo temporario\n");
       exit(1);
   }
-
-  printf("Pedido excluido com sucesso\n");
+  if (excluidos != 0) printf("Pedido excluido com sucesso\n");
+  else printf("Nao foram encontrados pedidos com esses parametros\n");
 }
-  
