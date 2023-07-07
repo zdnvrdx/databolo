@@ -58,24 +58,26 @@ int main(void)
 
 void consultarPedidos() {
     FILE *arq;
-    struct pedido p;
+    struct pedido pd;
     arq = fopen(NOMEARQUIVO, "rb");
     if (arq == NULL) {
         fprintf(stderr, "Nao abriu %s\n", NOMEARQUIVO);
         exit(1);
     }
     printf("---------------------------------\n");
-    printf("-- Nome ----- CPF ----- Bolo ---- Data --\n");
+    
+    printf("-- Data ----- Bolo ----- CPF ---- Nome --\n");
 
-    while (fread(&p, sizeof(p), 1, arq) == 1 && !feof(arq)) {
+    while (fread(&pd, sizeof(pd), 1, arq) == 1 && !feof(arq)) {
         char nome_lower[100];
-        strcpy(nome_lower, p.nome_cliente);
+        strcpy(nome_lower, pd.nome_cliente);
         for (int i = 0; i < strlen(nome_lower); i++) {
             nome_lower[i] = tolower(nome_lower[i]);
         }
 
-        printf("%s %6llu %6s %02d/%02d/%04d\n",
-               nome_lower, p.cpf, p.tipo_bolo, p.quando.dia, p.quando.mes, p.quando.ano);
+        printf("%02d/%02d/%04d %6s    %011llu  %s\n",
+               pd.quando.dia, pd.quando.mes, pd.quando.ano, pd.tipo_bolo, pd.cpf, nome_lower);
+        
     }
     printf("---------------------------------\n");
     fclose(arq);
@@ -107,7 +109,7 @@ void pedidoNovo() {
         }
 
         strcpy(pd.nome_cliente, novo_nome);
-        printf("CPF (somente numeros): ");
+        printf("CPF (somente numeros):\tO primeiro digito pode ser omitido se for igual a 0\n");
 
         do {
             cont_cpf = 0;
@@ -120,12 +122,12 @@ void pedidoNovo() {
                     temp_cpf /= 10;
                     cont_cpf++;
                 }
-                if (cont_cpf != 11) {
+                if (cont_cpf != 11 && cont_cpf != 10) {
                     printf("O CPF precisa de 11 digitos\n");
                     printf("Informe o CPF novamente: ");
                 }
             }
-        } while (cont_cpf != 11);
+        } while (cont_cpf != 11 && cont_cpf != 10);
 
         printf("tipo de bolo: ");
         scanf("%s", pd.tipo_bolo);
@@ -207,8 +209,11 @@ void localizarPedidos() {
                 while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq))
                     if (strstr(pd.nome_cliente, localiza)!=NULL)
                     {
-                        printf("%s %6llu %6s %02d/%02d/%04d\n",
-                               pd.nome_cliente, pd.cpf, pd.tipo_bolo, pd.quando.dia, pd.quando.mes, pd.quando.ano);
+                        printf("---------------------------------\n");
+                        printf("-- Data ----- Bolo ----- CPF ---- Nome --\n");
+                        printf("%02d/%02d/%04d %6s    %011llu  %s\n",
+                             pd.quando.dia, pd.quando.mes, pd.quando.ano, pd.tipo_bolo, pd.cpf, pd.nome_cliente);
+                        printf("---------------------------------\n");
                         encontrados++;
                     }
                 if (encontrados==0)
@@ -227,8 +232,11 @@ void localizarPedidos() {
                     snprintf(cpf_str, sizeof(cpf_str), "%011llu", pd.cpf);
                     if (strstr(cpf_str, localiza)!=NULL)
                     {
-                        printf("%s %6llu %6s %02d/%02d/%04d\n",
-                               pd.nome_cliente, pd.cpf, pd.tipo_bolo, pd.quando.dia, pd.quando.mes, pd.quando.ano);
+                        printf("---------------------------------\n");
+                        printf("-- Data ----- Bolo ----- CPF ---- Nome --\n");
+                        printf("%02d/%02d/%04d %6s    %011llu  %s\n",
+                             pd.quando.dia, pd.quando.mes, pd.quando.ano, pd.tipo_bolo, pd.cpf, pd.nome_cliente);
+                        printf("---------------------------------\n");
                         encontrados++;
                     }
                 }
@@ -247,8 +255,11 @@ void localizarPedidos() {
                 while(fread(&pd,sizeof(pd),1,arq)==1 && !feof(arq)){
                     if (strstr(pd.tipo_bolo, localiza)!=NULL)
                     {
-                        printf("%s %6llu %6s %02d/%02d/%04d\n",
-                               pd.nome_cliente, pd.cpf, pd.tipo_bolo, pd.quando.dia, pd.quando.mes, pd.quando.ano);
+                        printf("---------------------------------\n");
+                        printf("-- Data ----- Bolo ----- CPF ---- Nome --\n");
+                        printf("%02d/%02d/%04d %6s    %011llu  %s\n",
+                                pd.quando.dia, pd.quando.mes, pd.quando.ano, pd.tipo_bolo, pd.cpf, pd.nome_cliente);
+                        printf("---------------------------------\n");
                         encontrados++;
                     }
                 }
@@ -266,8 +277,11 @@ void localizarPedidos() {
                     if (( pd.quando.dia == localiza_data.dia) && (localiza_data.mes == -1 || pd.quando.mes == localiza_data.mes) &&
                         (localiza_data.ano == -1 || pd.quando.ano == localiza_data.ano))
                     {
-                        printf("%s %6llu %6s %02d/%02d/%04d\n",
-                               pd.nome_cliente, pd.cpf, pd.tipo_bolo, pd.quando.dia, pd.quando.mes, pd.quando.ano);
+                        printf("---------------------------------\n");
+                        printf("-- Data ----- Bolo ----- CPF ---- Nome --\n");
+                        printf("%02d/%02d/%04d %6s    %011llu  %s\n",
+                                    pd.quando.dia, pd.quando.mes, pd.quando.ano, pd.tipo_bolo, pd.cpf, pd.nome_cliente);
+                        printf("---------------------------------\n");
                         encontrados++;
                     }
                 }
@@ -310,7 +324,7 @@ void excluirPedidos() {
   for (int i = 0; i < strlen(nome_excl); i++) {
                     nome_excl[i] = tolower(nome_excl[i]);
                 }
-    printf("CPF (somente numeros): ");
+    printf("CPF (somente numeros):\tO primeiro digito pode ser omitido se for igual a 0\n");
   
 
     do {
@@ -324,12 +338,12 @@ void excluirPedidos() {
                 temp_cpf /= 10;
                 cont_cpf++;
             }
-            if (cont_cpf != 11) {
+            if (cont_cpf != 11 && cont_cpf != 10) {
                 printf("O CPF precisa de 11 digitos\n");
                 printf("Informe o CPF novamente: ");
             }
         }
-    } while (cont_cpf != 11);
+    } while (cont_cpf != 11 && cont_cpf != 10);
 
     printf("tipo de bolo: ");
     scanf("%s", tipo_bolo_excl);
@@ -393,8 +407,7 @@ void excluirPedidos() {
           if (tolower(confirm) == 's') {
             excluidos++;
               continue;
-        }
-          else excluidos--;  
+    }
 }
 
         // Escreva o pedido atual no arquivo temporário
@@ -416,10 +429,8 @@ void excluirPedidos() {
         fprintf(stderr, "Erro ao renomear o arquivo temporario\n");
         exit(1);
     }
-    if (excluidos == 1)
-        printf("\nPedido excluido com sucesso\n");
-    else if (excluidos == -1)
-        printf("\nPedido nao excluido\n");
+    if (excluidos != 0)
+        printf("Pedido excluido com sucesso\n");
     else
-        printf("\nNao foram encontrados pedidos com esses parametros\n");
+        printf("Nao foram encontrados pedidos com esses parametros\n");
 }
